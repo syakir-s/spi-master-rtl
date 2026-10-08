@@ -96,31 +96,78 @@ initial
         do_read(8'h00) ;    // T1 test read of DEVID_AD (0x00)                    
         if (command_byte !== 8'h0B) 
             begin 
-                $error("MISMATCH: expected_output =8'h0B actual_output =%h", command_byte);
+                $error("T1 command_byte MISMATCH: expected_output =8'h0B actual_output =%h", command_byte);
             end
         else
             begin 
-                $display("PASS: output =8'h0B");
+                $display("T1 command_byte PASS: output =8'h0B");
             end
          
          if (address_byte !== 8'h00)
             begin 
-                $error("MISMATCH: expected_output =8'h00 actual_output =%h", address_byte);
+                $error("T1 address_byte MISMATCH: expected_output =8'h00 actual_output =%h", address_byte);
             end
         else
             begin 
-                $display("PASS: output =8'h00");
+                $display("T1 address_byte PASS: output =8'h00");
             end
               
         if (data_out !== 8'hAD)
             begin 
-                $error("MISMATCH: expected_output =8'hAD actual_output =%h", data_out);
+                $error("T1 data_out MISMATCH: expected_output =8'hAD actual_output =%h", data_out);
             end
         else
             begin 
-                $display("PASS: output =8'hAD");
-                
+                $display("T1 data_out PASS: output =8'hAD");                
             end
+            
+        do_write(8'h2C, 8'hAB ); // T2 test write 0xAB to 0x2C
+        
+        if (command_byte !== 8'h0A) 
+            begin 
+                $error("T2 command_byte MISMATCH: expected_output =8'h0A actual_output =%h", command_byte);
+            end
+        else
+            begin 
+                $display("T2 command_byte PASS: output =8'h0A");
+            end   
+        
+        if (address_byte !== 8'h2C)
+            begin 
+                $error("T2 address_byte MISMATCH: expected_output =8'h2C actual_output =%h", address_byte);
+            end
+        else
+            begin 
+                $display("T2 address_byte PASS: output =8'h2C");
+            end
+                 
+        if (data_out !== 8'hAD)
+            begin 
+                $error("T2 data_out MISMATCH: expected_output =8'hAD actual_output =%h", data_out);
+            end
+        else
+            begin 
+                $display("T2 data_out PASS: output =8'hAD");                
+            end
+                 
+        if (write_byte !== 8'hAB)
+            begin 
+                $error("T2 write_byte MISMATCH: expected_output =8'hAB actual_output =%h", write_byte);
+            end
+        else
+            begin 
+                $display("T2 write_byte PASS: output =8'hAB");                
+            end    
+        
+                if (memory[8'h2C] !== 8'hAB)
+            begin 
+                $error("T2 memory[8'h2C] MISMATCH: expected_output =8'hAB actual_output =%h", memory[8'h2C]);
+            end
+        else
+            begin 
+                $display("T2 memory[8'h2C] PASS: output =8'hAB");                
+            end
+
          $finish;
          end  
            
