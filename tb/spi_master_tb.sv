@@ -105,5 +105,19 @@ task automatic do_read(input [7:0] addr);
         #1;
         start_spi   = 0;
         @(negedge busy);
-    endtask      
+    endtask
+    
+task automatic do_write(input [7:0] addr, input [7:0] scnd);
+    @(posedge iclk);
+        address_in  = addr;
+        rw_in       = 1;
+        data_in     = scnd; 
+        #1;
+        start_spi   = 1;
+        @(posedge iclk); 
+        #1;
+        start_spi   = 0;
+        @(negedge busy);
+    endtask
+             
 endmodule
