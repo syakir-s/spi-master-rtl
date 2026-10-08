@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module spi_master_tb;
 
 logic iclk;
@@ -36,8 +38,26 @@ initial
     begin
         for (int i = 0; i < 64 ;i++)
             memory [i]       = 8'h00;
-            memory [8'h00]   = 8'hAD; 
-            memory [8'h02]   = 8'hF2;
-            memory [8'h2C]   = 8'h13;
+        memory [8'h00]   = 8'hAD; 
+        memory [8'h02]   = 8'hF2;
+        memory [8'h2C]   = 8'h13;
+    end  
+    
+always @(negedge cs)
+    begin
+        counter <= 0;
     end
+
+always @(posedge sclk) 
+    begin
+       if (cs == 0)
+        begin
+            counter <= counter + 1; 
+            case (counter [4:3]) 
+                    2'd0    : command_byte [7 - counter[2:0]]   <= mosi; 
+                    2'd1    : address_byte [7 - counter[2:0]]   <= mosi;
+                    2'd2    : write_byte [7 - counter[2:0]]     <= mosi; 
+                endcase
+        end
+    end   
 endmodule
