@@ -94,4 +94,16 @@ initial
         #20;
         rst         = 0;
     end
+    
+task automatic do_read(input [7:0] addr); 
+    @(posedge iclk);
+        address_in  = addr;
+        rw_in       = 0;
+        #1;
+        start_spi   = 1;
+        @(posedge iclk); 
+        #1;
+        start_spi   = 0;
+        @(negedge busy);
+    endtask      
 endmodule
