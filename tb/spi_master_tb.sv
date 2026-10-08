@@ -93,8 +93,37 @@ initial
         miso        = 0;
         #20;
         rst         = 0;
-    end
-    
+        do_read(8'h00) ;    // T1 test read of DEVID_AD (0x00)                    
+        if (command_byte !== 8'h0B) 
+            begin 
+                $error("MISMATCH: expected_output =8'h0B actual_output =%h", command_byte);
+            end
+        else
+            begin 
+                $display("PASS: output =8'h0B");
+            end
+         
+         if (address_byte !== 8'h00)
+            begin 
+                $error("MISMATCH: expected_output =8'h00 actual_output =%h", address_byte);
+            end
+        else
+            begin 
+                $display("PASS: output =8'h00");
+            end
+              
+        if (data_out !== 8'hAD)
+            begin 
+                $error("MISMATCH: expected_output =8'hAD actual_output =%h", data_out);
+            end
+        else
+            begin 
+                $display("PASS: output =8'hAD");
+                
+            end
+         $finish;
+         end  
+           
 task automatic do_read(input [7:0] addr); 
     @(posedge iclk);
         address_in  = addr;
@@ -104,7 +133,7 @@ task automatic do_read(input [7:0] addr);
         @(posedge iclk); 
         #1;
         start_spi   = 0;
-        @(negedge busy);
+        @(negedge busy);        
     endtask
     
 task automatic do_write(input [7:0] addr, input [7:0] scnd);
@@ -118,6 +147,6 @@ task automatic do_write(input [7:0] addr, input [7:0] scnd);
         #1;
         start_spi   = 0;
         @(negedge busy);
-    endtask
-             
+    endtask    
+       
 endmodule
