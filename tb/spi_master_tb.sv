@@ -31,7 +31,7 @@ spi_master dut(
 );
  
 logic [4:0] counter;
-logic [7:0] command_byte, address_byte, write_byte, read_byte;
+logic [7:0] command_byte, address_byte, write_byte;
 logic [7:0] memory [0:63];
 
 initial 
@@ -59,5 +59,19 @@ always @(posedge sclk)
                     2'd2    : write_byte [7 - counter[2:0]]     <= mosi; 
                 endcase
         end
-    end   
+    end
+
+always @(negedge sclk)
+    begin
+        if (command_byte == 8'h0B && counter [4:3] == 2 && cs == 0)
+            begin
+                miso <= memory [address_byte][7 - counter [2:0]];
+            end
+    end
+      
+always @(posedge cs)
+        if (command_byte == 8'h0A && counter [4:3] == 3) 
+            begin
+                memory [address_byte] <= write_byte; 
+            end
 endmodule
