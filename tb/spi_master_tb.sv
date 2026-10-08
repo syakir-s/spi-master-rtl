@@ -70,8 +70,28 @@ always @(negedge sclk)
     end
       
 always @(posedge cs)
+    begin
         if (command_byte == 8'h0A && counter [4:3] == 3) 
             begin
                 memory [address_byte] <= write_byte; 
             end
+    end          
+always
+    begin
+        #5
+        iclk = ~iclk;
+    end
+    
+initial iclk = 0; 
+initial
+    begin 
+        rst         = 1;
+        start_spi   = 0;
+        address_in  = 0;
+        data_in     = 0;
+        rw_in       = 0;
+        miso        = 0;
+        #20;
+        rst         = 0;
+    end
 endmodule
