@@ -35,6 +35,7 @@ logic [7:0] command_byte, address_byte, write_byte;
 logic [7:0] memory [0:63];
 int cs_fall_count;
 realtime timing;
+realtime t_mosi;
 
 initial 
     begin
@@ -369,18 +370,24 @@ initial
                   
 // I1 rises with cs falling; high while cs is low; falls 30 ns after cs rises
 
-always @(posedge cs)                    // event 1: take the snapshot
+always @(posedge cs)                   
     timing = $realtime;
 
-always @(negedge busy)                  // event 2: measure and check
-    if (!rst)                         // skip during reset
+always @(negedge busy)                 
+    if (!rst)                         
         if ($realtime - timing != 30)
             $error("I1 MISMATCH: gap = %0t, expected 30 ns", $realtime - timing);
         else
-            $display("I1 PASS: gap = 30 ns");
- 
-//I2 cs_fall_count counter 
+            $display("I1 PASS: gap = 30 ns"); 
+//P2 
 
+always @(mosi)
+    t_mosi = $realtime;
+    
+always @(posedge sclk)
+        if ($realtime - t_mosi < 20)
+            $error("P2 tSU VIOLATION!!!: gap = %0t is less than 20 ns, expected 30 ns", $realtime - t_mosi);
+        
 always @(negedge cs)
         begin
             cs_fall_count = cs_fall_count + 1;  
