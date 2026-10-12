@@ -227,6 +227,56 @@ initial
                 $display("I3 data_out PASS: output =8'hAD");
             end          
         
+        //R1 cs = 1, sclk = 0, mosi = 1, busy = 0, data_out = 0xFF 
+        rst = 1 ;
+        #20;
+        
+        if (cs !== 1) 
+            begin 
+                $error("R1 cs MISMATCH: cs =1 actual_output =%d", cs);
+            end
+        else
+            begin 
+                $display("R1 CS PASS: output =1");
+            end 
+            
+        if (sclk !== 0) 
+            begin 
+                $error("R1 sclk MISMATCH: sclk =0 actual_output =%d", sclk);
+            end
+        else
+            begin 
+                $display("R1 sclk PASS: output =0");
+            end 
+
+        if (mosi !== 1) 
+            begin 
+                $error("R1 mosi MISMATCH: mosi =1 actual_output =%d", mosi);
+            end
+        else
+            begin 
+                $display("R1 mosi PASS: output =1");
+            end 
+            
+        if (busy !== 0) 
+            begin 
+                $error("R1 busy MISMATCH: busy =0 actual_output =%d", busy);
+            end
+        else
+            begin 
+                $display("R1 busy PASS: output =0");
+            end 
+        rst=0;
+        
+        if (data_out !== 8'hFF) 
+            begin 
+                $error("R1 data_out MISMATCH: busy =8'hFF actual_output =%h", data_out);
+            end
+        else
+            begin 
+                $display("R1 data_out PASS: output =8'hFF");
+            end 
+        
          $finish;
          end  
            
