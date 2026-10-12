@@ -34,6 +34,7 @@ logic [4:0] counter;
 logic [7:0] command_byte, address_byte, write_byte;
 logic [7:0] memory [0:63];
 int cs_fall_count;
+int sclk_count;
 realtime timing;
 realtime t_mosi;
 realtime t_hold;
@@ -411,6 +412,18 @@ always @(sclk)
             end   
     end
 
+//P4
+always @(negedge cs)
+    sclk_count = 0;
+
+always @(posedge sclk)        
+    sclk_count = sclk_count + 1;
+    
+always @(posedge cs)
+    if (!rst)  
+        if (sclk_count !== 24)    
+            $error("P4 VIOLATION!!!!! MISMATCH: sclk_count =24 , actual_sclk_count = %0d",sclk_count);
+        
 task automatic do_read(input [7:0] addr); 
     @(posedge iclk);
         address_in  = addr;
