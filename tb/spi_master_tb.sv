@@ -33,6 +33,8 @@ spi_master dut(
 logic [4:0] counter;
 logic [7:0] command_byte, address_byte, write_byte;
 logic [7:0] memory [0:63];
+int cs_fall_count;
+realtime timing;
 
 initial 
     begin
@@ -334,13 +336,34 @@ initial
             end
                 
     rst = 0;
-                     
+
+//I2 start_spi during busy gives exactly 1 CS falling edge  
+    cs_fall_count = 0;
+    fork
+        do_read(8'h2C);
+            begin
+                #800;
+                @(posedge iclk); #1;
+                start_spi = 1;
+                @(posedge iclk); #1;    
+                start_spi = 0;        
+            end 
+    join
+    #100;
+    
+        if (cs_fall_count !== 1) 
+            begin 
+                $error("I2 cs_fall_count MISMATCH: cs_fall_count =1 actual_cs_fall_count =%d", cs_fall_count);
+            end
+        else
+            begin 
+                $display("I2 cs_fall_count PASS: cs_fall_count =1");
+            end
+
          $finish;
          end 
-          
+                  
 // I1 rises with cs falling; high while cs is low; falls 30 ns after cs rises
-
-realtime timing;                          // storage for the snapshot
 
 always @(posedge cs)                    // event 1: take the snapshot
     timing = $realtime;
@@ -352,6 +375,13 @@ always @(negedge busy)                  // event 2: measure and check
         else
             $display("I1 PASS: gap = 30 ns");
  
+
+//I2 cs_fall_count counter 
+
+always @(negedge cs)
+        begin
+            cs_fall_count = cs_fall_count + 1;  
+        end
           
 task automatic do_read(input [7:0] addr); 
     @(posedge iclk);
