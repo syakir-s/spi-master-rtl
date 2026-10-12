@@ -360,6 +360,10 @@ initial
                 $display("I2 cs_fall_count PASS: cs_fall_count =1");
             end
 
+// uncomment both line below to verify P1 protocol test
+//force sclk = 1; #10; 
+//release sclk; 
+
          $finish;
          end 
                   
@@ -375,13 +379,21 @@ always @(negedge busy)                  // event 2: measure and check
         else
             $display("I1 PASS: gap = 30 ns");
  
-
 //I2 cs_fall_count counter 
 
 always @(negedge cs)
         begin
             cs_fall_count = cs_fall_count + 1;  
         end
+
+//P1 SCLK low whenever cs is high (read/write)
+always @(sclk)
+    begin
+        if (!rst && cs ==1 )
+            begin 
+                $error("P1 VIOLATION!!!!! ");
+            end   
+    end
           
 task automatic do_read(input [7:0] addr); 
     @(posedge iclk);
@@ -407,7 +419,5 @@ task automatic do_write(input [7:0] addr, input [7:0] scnd);
         start_spi   = 0;
         @(negedge busy);
     endtask  
-    
-  
        
 endmodule
