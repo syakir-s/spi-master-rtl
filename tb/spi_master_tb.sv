@@ -276,6 +276,63 @@ initial
             begin 
                 $display("R1 data_out PASS: output =8'hFF");
             end 
+
+// E2 same as R1            
+    fork
+        do_read (8'h2C);
+        begin
+            #4100;
+            rst = 1;  
+        end
+    join
+    #20;
+
+        if (cs !== 1) 
+            begin 
+                $error("E2 cs MISMATCH: cs =1 actual_output =%d", cs);
+            end
+        else
+            begin 
+                $display("E2 CS PASS: output =1");
+            end 
+            
+        if (sclk !== 0) 
+            begin 
+                $error("E2 sclk MISMATCH: sclk =0 actual_output =%d", sclk);
+            end
+        else
+            begin 
+                $display("E2 sclk PASS: output =0");
+            end 
+
+        if (mosi !== 1) 
+            begin 
+                $error("E2 mosi MISMATCH: mosi =1 actual_output =%d", mosi);
+            end
+        else
+            begin 
+                $display("E2 mosi PASS: output =1");
+            end 
+            
+        if (busy !== 0) 
+            begin 
+                $error("E2 busy MISMATCH: busy =0 actual_output =%d", busy);
+            end
+        else
+            begin 
+                $display("E2 busy PASS: output =0");
+            end 
+        
+        if (data_out !== 8'hFF) 
+            begin 
+                $error("E2 data_out MISMATCH: busy =8'hFF actual_output =%h", data_out);
+            end
+        else
+            begin 
+                $display("E2 data_out PASS: output =8'hFF");
+            end
+                
+    rst = 0;
         
          $finish;
          end  
