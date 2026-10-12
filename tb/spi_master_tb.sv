@@ -36,6 +36,7 @@ logic [7:0] memory [0:63];
 int cs_fall_count;
 realtime timing;
 realtime t_mosi;
+realtime t_hold;
 
 initial 
     begin
@@ -379,20 +380,28 @@ always @(negedge busy)
             $error("I1 MISMATCH: gap = %0t, expected 30 ns", $realtime - timing);
         else
             $display("I1 PASS: gap = 30 ns"); 
-//P2 
+            
+//P2 MOSI bit shifted on SCLK falling edge; sampled on rising edge (read/write)
 
 always @(mosi)
     t_mosi = $realtime;
     
 always @(posedge sclk)
         if ($realtime - t_mosi < 20)
-            $error("P2 tSU VIOLATION!!!: gap = %0t is less than 20 ns, expected 30 ns", $realtime - t_mosi);
+            $error("P2 tSU VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_mosi);
         
 always @(negedge cs)
         begin
             cs_fall_count = cs_fall_count + 1;  
         end
 
+always @(posedge sclk)
+    t_hold = $realtime;
+    
+always @(mosi)
+    if (!rst && $realtime - t_hold < 20 )
+        $error("P2 tHD VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_hold);
+        
 //P1 SCLK low whenever cs is high (read/write)
 always @(sclk)
     begin
@@ -401,7 +410,7 @@ always @(sclk)
                 $error("P1 VIOLATION!!!!! ");
             end   
     end
-          
+
 task automatic do_read(input [7:0] addr); 
     @(posedge iclk);
         address_in  = addr;
