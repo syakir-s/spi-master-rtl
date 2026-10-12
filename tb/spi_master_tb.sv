@@ -226,7 +226,8 @@ initial
             begin 
                 $display("I3 data_out PASS: output =8'hAD");
             end          
-        
+
+        @(posedge iclk);        
         //R1 cs = 1, sclk = 0, mosi = 1, busy = 0, data_out = 0xFF 
         rst = 1 ;
         #20;
@@ -333,10 +334,25 @@ initial
             end
                 
     rst = 0;
-        
+                     
          $finish;
-         end  
-           
+         end 
+          
+// I1 rises with cs falling; high while cs is low; falls 30 ns after cs rises
+
+realtime timing;                          // storage for the snapshot
+
+always @(posedge cs)                    // event 1: take the snapshot
+    timing = $realtime;
+
+always @(negedge busy)                  // event 2: measure and check
+    if (!rst)                         // skip during reset
+        if ($realtime - timing != 30)
+            $error("I1 MISMATCH: gap = %0t, expected 30 ns", $realtime - timing);
+        else
+            $display("I1 PASS: gap = 30 ns");
+ 
+          
 task automatic do_read(input [7:0] addr); 
     @(posedge iclk);
         address_in  = addr;
