@@ -167,6 +167,39 @@ initial
             begin 
                 $display("T2 memory[8'h2C] PASS: output =8'hAB");                
             end
+            
+        do_read (8'h2C);    // E1 test read 0x2C gives 0xAB
+        
+        if (data_out !== 8'hAB) 
+            begin 
+                $error("E1 data_out MISMATCH: data_out =8'hAB actual_output =%h", data_out);
+            end
+        else
+            begin 
+                $display("E1 data_out PASS: output =8'hAB");
+            end
+            
+        do_read (8'h00);    // E3 test 0x00 gives 0xAD, then 0x02 gives 0xF2
+        
+        if (data_out !== 8'hAD) 
+            begin 
+                $error("E3 register 0x00 data_out MISMATCH: data_out =8'hAD actual_output =%h", data_out);
+            end
+        else
+            begin 
+                $display("E3 register 0x00 data_out PASS: output =8'hAD");
+            end
+
+        do_read (8'h02);
+
+            if (data_out !== 8'hF2) 
+            begin 
+                $error("E3 register 0x02 data_out MISMATCH: data_out =8'hF2 actual_output =%h", data_out);
+            end
+        else
+            begin 
+                $display("E3 regster 0x02 data_out PASS: output =8'hF2");
+            end            
 
          $finish;
          end  
@@ -194,6 +227,8 @@ task automatic do_write(input [7:0] addr, input [7:0] scnd);
         #1;
         start_spi   = 0;
         @(negedge busy);
-    endtask    
+    endtask  
+    
+  
        
 endmodule
