@@ -179,7 +179,7 @@ initial
                 $display("E1 data_out PASS: output =8'hAB");
             end
             
-        do_read (8'h00);    // E3 test 0x00 gives 0xAD, then 0x02 gives 0xF2
+        do_read (8'h00);
         
         if (data_out !== 8'hAD) 
             begin 
@@ -199,8 +199,34 @@ initial
         else
             begin 
                 $display("E3 regster 0x02 data_out PASS: output =8'hF2");
-            end            
+            end   
+            
+    fork 
+        do_read(8'h00);
+        begin
+            #2500; 
+            address_in = 8'h12;
+        end        
+    join
+        
+         if (address_byte !== 8'h00) 
+            begin 
+                $error("I3 address_byte MISMATCH: address_byte =8'h00 actual_address_byte =%h", address_byte);
+            end
+        else
+            begin 
+                $display("I3 address_byte PASS: output =8'h00");
+            end 
 
+        if (data_out !== 8'hAD) 
+            begin 
+                $error("I3 data_out MISMATCH: data_out =8'hAD actual_output =%h", data_out);
+            end
+        else
+            begin 
+                $display("I3 data_out PASS: output =8'hAD");
+            end          
+        
          $finish;
          end  
            
