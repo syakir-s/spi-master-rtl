@@ -38,6 +38,7 @@ int sclk_count;
 realtime timing;
 realtime t_mosi;
 realtime t_hold;
+realtime t_css;
 
 initial 
     begin
@@ -412,18 +413,27 @@ always @(sclk)
             end   
     end
 
-//P4
-always @(negedge cs)
-    sclk_count = 0;
-
-always @(posedge sclk)        
+//P4 and C1
+always @(negedge cs)    
+    begin
+        sclk_count = 0;
+        t_css = $realtime;
+    end
+always @(posedge sclk) 
+    begin       
     sclk_count = sclk_count + 1;
+    if (sclk_count == 1)
+                if ($realtime - t_css < 100)    
+                    $error("C1 tCSS VIOLATION!!!: gap = %0t is less than 100 ns", $realtime - t_css);
+    end
     
 always @(posedge cs)
-    if (!rst)  
-        if (sclk_count !== 24)    
-            $error("P4 VIOLATION!!!!! MISMATCH: sclk_count =24 , actual_sclk_count = %0d",sclk_count);
-        
+    begin
+        if (!rst) 
+            if (sclk_count !== 24)    
+                $error("P4 VIOLATION!!!!! MISMATCH: sclk_count =24 , actual_sclk_count = %0d",sclk_count);
+    end
+    
 task automatic do_read(input [7:0] addr); 
     @(posedge iclk);
         address_in  = addr;
@@ -434,7 +444,7 @@ task automatic do_read(input [7:0] addr);
         #1;
         start_spi   = 0;
         @(negedge busy);        
-    endtask
+    endtask               
     
 task automatic do_write(input [7:0] addr, input [7:0] scnd);
     @(posedge iclk);
