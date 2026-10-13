@@ -35,12 +35,15 @@ logic [7:0] command_byte, address_byte, write_byte;
 logic [7:0] memory [0:63];
 int cs_fall_count;
 int sclk_count;
+int err_cnt;
+int activity_cnt;
 realtime timing;
 realtime t_mosi;
 realtime t_hold;
 realtime t_css;
 realtime t_csh;
 realtime t_csd;
+
 
 initial 
     begin
@@ -92,7 +95,8 @@ always
     
 initial iclk = 0; 
 initial
-    begin 
+    begin
+        $timeformat(-9, 1, " ns", 0); 
         rst         = 1;
         start_spi   = 0;
         address_in  = 0;
@@ -105,6 +109,7 @@ initial
         if (command_byte !== 8'h0B) 
             begin 
                 $error("T1 command_byte MISMATCH: expected_output =8'h0B actual_output =%h", command_byte);
+                err_cnt++;
             end
         else
             begin 
@@ -114,6 +119,7 @@ initial
          if (address_byte !== 8'h00)
             begin 
                 $error("T1 address_byte MISMATCH: expected_output =8'h00 actual_output =%h", address_byte);
+                err_cnt++;
             end
         else
             begin 
@@ -123,6 +129,7 @@ initial
         if (data_out !== 8'hAD)
             begin 
                 $error("T1 data_out MISMATCH: expected_output =8'hAD actual_output =%h", data_out);
+                err_cnt++;
             end
         else
             begin 
@@ -134,6 +141,7 @@ initial
         if (command_byte !== 8'h0A) 
             begin 
                 $error("T2 command_byte MISMATCH: expected_output =8'h0A actual_output =%h", command_byte);
+                err_cnt++;
             end
         else
             begin 
@@ -143,6 +151,7 @@ initial
         if (address_byte !== 8'h2C)
             begin 
                 $error("T2 address_byte MISMATCH: expected_output =8'h2C actual_output =%h", address_byte);
+                err_cnt++;
             end
         else
             begin 
@@ -152,6 +161,7 @@ initial
         if (data_out !== 8'hAD)
             begin 
                 $error("T2 data_out MISMATCH: expected_output =8'hAD actual_output =%h", data_out);
+                err_cnt++;
             end
         else
             begin 
@@ -161,6 +171,7 @@ initial
         if (write_byte !== 8'hAB)
             begin 
                 $error("T2 write_byte MISMATCH: expected_output =8'hAB actual_output =%h", write_byte);
+                err_cnt++;
             end
         else
             begin 
@@ -170,6 +181,7 @@ initial
                 if (memory[8'h2C] !== 8'hAB)
             begin 
                 $error("T2 memory[8'h2C] MISMATCH: expected_output =8'hAB actual_output =%h", memory[8'h2C]);
+                err_cnt++;
             end
         else
             begin 
@@ -181,6 +193,7 @@ initial
         if (data_out !== 8'hAB) 
             begin 
                 $error("E1 data_out MISMATCH: data_out =8'hAB actual_output =%h", data_out);
+                err_cnt++;
             end
         else
             begin 
@@ -192,6 +205,7 @@ initial
         if (data_out !== 8'hAD) 
             begin 
                 $error("E3 register 0x00 data_out MISMATCH: data_out =8'hAD actual_output =%h", data_out);
+                err_cnt++;
             end
         else
             begin 
@@ -203,10 +217,11 @@ initial
             if (data_out !== 8'hF2) 
             begin 
                 $error("E3 register 0x02 data_out MISMATCH: data_out =8'hF2 actual_output =%h", data_out);
+                err_cnt++;
             end
         else
             begin 
-                $display("E3 regster 0x02 data_out PASS: output =8'hF2");
+                $display("E3 register 0x02 data_out PASS: output =8'hF2");
             end   
             
     fork 
@@ -220,6 +235,7 @@ initial
          if (address_byte !== 8'h00) 
             begin 
                 $error("I3 address_byte MISMATCH: address_byte =8'h00 actual_address_byte =%h", address_byte);
+                err_cnt++;
             end
         else
             begin 
@@ -229,6 +245,7 @@ initial
         if (data_out !== 8'hAD) 
             begin 
                 $error("I3 data_out MISMATCH: data_out =8'hAD actual_output =%h", data_out);
+                err_cnt++;
             end
         else
             begin 
@@ -243,6 +260,7 @@ initial
         if (cs !== 1) 
             begin 
                 $error("R1 cs MISMATCH: cs =1 actual_output =%d", cs);
+                err_cnt++;
             end
         else
             begin 
@@ -252,6 +270,7 @@ initial
         if (sclk !== 0) 
             begin 
                 $error("R1 sclk MISMATCH: sclk =0 actual_output =%d", sclk);
+                err_cnt++;
             end
         else
             begin 
@@ -261,6 +280,7 @@ initial
         if (mosi !== 1) 
             begin 
                 $error("R1 mosi MISMATCH: mosi =1 actual_output =%d", mosi);
+                err_cnt++;                
             end
         else
             begin 
@@ -270,6 +290,7 @@ initial
         if (busy !== 0) 
             begin 
                 $error("R1 busy MISMATCH: busy =0 actual_output =%d", busy);
+                err_cnt++;
             end
         else
             begin 
@@ -280,6 +301,7 @@ initial
         if (data_out !== 8'hFF) 
             begin 
                 $error("R1 data_out MISMATCH: busy =8'hFF actual_output =%h", data_out);
+                err_cnt++;
             end
         else
             begin 
@@ -299,6 +321,7 @@ initial
         if (cs !== 1) 
             begin 
                 $error("E2 cs MISMATCH: cs =1 actual_output =%d", cs);
+                err_cnt++;
             end
         else
             begin 
@@ -308,6 +331,7 @@ initial
         if (sclk !== 0) 
             begin 
                 $error("E2 sclk MISMATCH: sclk =0 actual_output =%d", sclk);
+                err_cnt++;
             end
         else
             begin 
@@ -317,6 +341,7 @@ initial
         if (mosi !== 1) 
             begin 
                 $error("E2 mosi MISMATCH: mosi =1 actual_output =%d", mosi);
+                err_cnt++;
             end
         else
             begin 
@@ -326,6 +351,7 @@ initial
         if (busy !== 0) 
             begin 
                 $error("E2 busy MISMATCH: busy =0 actual_output =%d", busy);
+                err_cnt++;
             end
         else
             begin 
@@ -335,6 +361,7 @@ initial
         if (data_out !== 8'hFF) 
             begin 
                 $error("E2 data_out MISMATCH: busy =8'hFF actual_output =%h", data_out);
+                err_cnt++;
             end
         else
             begin 
@@ -360,6 +387,7 @@ initial
         if (cs_fall_count !== 1) 
             begin 
                 $error("I2 cs_fall_count MISMATCH: cs_fall_count =1 actual_cs_fall_count =%d", cs_fall_count);
+                err_cnt++;
             end
         else
             begin 
@@ -369,31 +397,53 @@ initial
 // uncomment both line below to verify P1 protocol test
 //force sclk = 1; #10; 
 //release sclk; 
-
-         $finish;
-         end 
+    if (err_cnt != 0 )
+        begin
+            $display("FAIL %0d checks, %0d errors",activity_cnt, err_cnt);
+        end
+    else
+        begin
+            $display("PASS %0d checks, %0d errors",activity_cnt, err_cnt);    
+        end
+$finish;
+end 
                   
 // I1 rises with cs falling; high while cs is low; falls 30 ns after cs rises
 
 always @(posedge cs)                   
-    timing = $realtime;
-
+    begin
+        timing = $realtime;
+    end
+    
 always @(negedge busy)                 
-    if (!rst)                         
-        if ($realtime - timing != 30)
-            $error("I1 MISMATCH: gap = %0t, expected 30 ns", $realtime - timing);
-        else
-            $display("I1 PASS: gap = 30 ns"); 
-            
+    if (!rst)
+        begin
+            activity_cnt++;             
+                if ($realtime - timing != 30)
+                    begin
+                        $error("I1 MISMATCH: gap = %0t, expected 30 ns", $realtime - timing);
+                        err_cnt++;
+                    end
+                else
+                    $display("I1 PASS: gap = 30 ns"); 
+        end        
 //P2 MOSI bit shifted on SCLK falling edge; sampled on rising edge (read/write)
 
 always @(mosi)
-    t_mosi = $realtime;
+    begin
+        t_mosi = $realtime;
+    end
     
 always @(posedge sclk)
-        if ($realtime - t_mosi < 20)
-            $error("P2 tSU VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_mosi);
-        
+    begin
+        activity_cnt++;    
+            if ($realtime - t_mosi < 20)
+                begin
+                    $error("P2 tSU VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_mosi);
+                    err_cnt++;
+                end
+    end
+              
 always @(negedge cs)
         begin
             cs_fall_count = cs_fall_count + 1;  
@@ -403,15 +453,28 @@ always @(posedge sclk)
     t_hold = $realtime;
     
 always @(mosi)
-    if (!rst && $realtime - t_hold < 20 )
-        $error("P2 tHD VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_hold);
-        
+    begin
+        if (!rst)
+            begin
+                activity_cnt++;
+                    if ($realtime - t_hold < 20)
+                        begin
+                            $error("P2 tHD VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_hold);
+                            err_cnt++;
+                        end
+            end
+    end               
 //P1 SCLK low whenever cs is high (read/write)
 always @(sclk)
-    begin
-        if (!rst && cs ==1 )
+    begin   
+        if (!rst)
             begin 
-                $error("P1 VIOLATION!!!!! ");
+                activity_cnt++; 
+                    if (cs ==1)
+                        begin
+                            $error("P1 VIOLATION!!!!! ");
+                            err_cnt++;
+                        end
             end   
     end
 
@@ -421,19 +484,32 @@ always @(negedge cs)
         sclk_count = 0;
         t_css = $realtime;
     end
+    
 always @(posedge sclk) 
     begin       
-    sclk_count = sclk_count + 1;
-    if (sclk_count == 1)
-                if ($realtime - t_css < 100)    
-                    $error("C1 tCSS VIOLATION!!!: gap = %0t is less than 100 ns", $realtime - t_css);
+        sclk_count = sclk_count + 1;
+            if (sclk_count == 1)
+                begin
+                    activity_cnt++;             
+                        if ($realtime - t_css < 100)
+                            begin    
+                                $error("C1 tCSS VIOLATION!!!: gap = %0t is less than 100 ns", $realtime - t_css);
+                                err_cnt++;
+                            end        
+                end   
     end
     
 always @(posedge cs)
     begin
-        if (!rst) 
-            if (sclk_count !== 24)    
-                $error("P4 VIOLATION!!!!! MISMATCH: sclk_count =24 , actual_sclk_count = %0d",sclk_count);
+        if (!rst)
+            begin 
+                activity_cnt++;             
+                    if (sclk_count !== 24)    
+                        begin
+                            $error("P4 VIOLATION!!!!! MISMATCH: sclk_count =24 , actual_sclk_count = %0d",sclk_count);
+                            err_cnt++;
+                        end
+            end    
     end
   
 //C2 
@@ -445,10 +521,12 @@ always @(negedge sclk)
 always @(posedge cs)
     if (!rst)
         begin
-            if ($realtime - t_csh < 20)
-                begin
-                     $error("C2 tCSH VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_csh);   
-                end 
+            activity_cnt++;  
+                if ($realtime - t_csh < 20)
+                    begin
+                         $error("C2 tCSH VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_csh);
+                         err_cnt++;   
+                    end 
         end
     
 //C3 
@@ -463,9 +541,14 @@ always @(posedge cs)
 always @(negedge cs)
     begin
     
-        if (($realtime - t_csd < 20) && (t_csd != 0))
+        if (t_csd != 0)
             begin
-                 $error("C3 tCSD VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_csd);   
+                activity_cnt++;  
+                    if ($realtime - t_csd < 20)
+                        begin
+                            $error("C3 tCSD VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_csd);   
+                            err_cnt++;
+                        end          
             end 
     end
         
