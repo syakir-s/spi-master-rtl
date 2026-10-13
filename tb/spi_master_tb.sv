@@ -39,6 +39,7 @@ realtime timing;
 realtime t_mosi;
 realtime t_hold;
 realtime t_css;
+realtime t_csh;
 
 initial 
     begin
@@ -433,7 +434,22 @@ always @(posedge cs)
             if (sclk_count !== 24)    
                 $error("P4 VIOLATION!!!!! MISMATCH: sclk_count =24 , actual_sclk_count = %0d",sclk_count);
     end
+  
+//C2 
+always @(negedge sclk)
+    begin
+        t_csh = $realtime;
+    end    
     
+always @(posedge cs)
+    if (!rst)
+        begin
+            if ($realtime - t_csh < 20)
+                begin
+                     $error("C2 tCSH VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_csh);   
+                end 
+        end
+        
 task automatic do_read(input [7:0] addr); 
     @(posedge iclk);
         address_in  = addr;
