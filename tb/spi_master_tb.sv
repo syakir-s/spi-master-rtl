@@ -40,6 +40,7 @@ realtime t_mosi;
 realtime t_hold;
 realtime t_css;
 realtime t_csh;
+realtime t_csd;
 
 initial 
     begin
@@ -449,7 +450,26 @@ always @(posedge cs)
                      $error("C2 tCSH VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_csh);   
                 end 
         end
+    
+//C3 
+always @(posedge cs)
+    begin
+        if (!rst)
+            begin
+                t_csd = $realtime;
+            end
+    end        
+    
+always @(negedge cs)
+    begin
+    
+        if (($realtime - t_csd < 20) && (t_csd != 0))
+            begin
+                 $error("C3 tCSD VIOLATION!!!: gap = %0t is less than 20 ns", $realtime - t_csd);   
+            end 
+    end
         
+    
 task automatic do_read(input [7:0] addr); 
     @(posedge iclk);
         address_in  = addr;
