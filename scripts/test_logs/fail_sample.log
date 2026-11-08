@@ -1,0 +1,64 @@
+INFO: [Vivado 12-12493] Simulation top is 'spi_master_tb'
+INFO: [Vivado 12-5682] Launching behavioral simulation in 'C:/Users/syaki/spi_master/spi_master.sim/sim_1/behav/xsim'
+INFO: [SIM-utils-51] Simulation object is 'sim_1'
+INFO: [USF-XSim-3] XSim::Elaborate design
+INFO: [USF-XSim-61] Executing 'ELABORATE' step in 'C:/Users/syaki/spi_master/spi_master.sim/sim_1/behav/xsim'
+"xelab --incr --debug typical --relax --mt 2 -L xil_defaultlib -L uvm -L unisims_ver -L unimacro_ver -L secureip --snapshot spi_master_tb_behav xil_defaultlib.spi_master_tb xil_defaultlib.glbl -log elaborate.log"
+Vivado Simulator v2025.2
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: C:/AMDDesignTools/2025.2/Vivado/bin/unwrapped/win64.o/xelab.exe --incr --debug typical --relax --mt 2 -L xil_defaultlib -L uvm -L unisims_ver -L unimacro_ver -L secureip --snapshot spi_master_tb_behav xil_defaultlib.spi_master_tb xil_defaultlib.glbl -log elaborate.log 
+Using 2 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module xil_defaultlib.spi_master
+Compiling module xil_defaultlib.spi_master_tb
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot spi_master_tb_behav
+run_program: Time (s): cpu = 00:00:02 ; elapsed = 00:00:11 . Memory (MB): peak = 1820.969 ; gain = 0.000
+INFO: [USF-XSim-69] 'elaborate' step finished in '11' seconds
+launch_simulation: Time (s): cpu = 00:00:02 ; elapsed = 00:00:11 . Memory (MB): peak = 1820.969 ; gain = 0.000
+Time resolution is 1 ps
+relaunch_sim: Time (s): cpu = 00:00:03 ; elapsed = 00:00:19 . Memory (MB): peak = 1820.969 ; gain = 0.000
+run all
+T1 command_byte PASS: output =8'h0B
+T1 address_byte PASS: output =8'h00
+Error: T1 data_out MISMATCH: expected_output =8'hAD actual_output =ac
+Time: 4895 ns  Iteration: 1  Process: /spi_master_tb/Initial97_16  Scope: spi_master_tb  File: C:/Users/syaki/spi_master/spi_master.srcs/sim_1/new/spi_master_tb.sv Line: 131
+I1 PASS: gap = 30 ns
+T2 command_byte PASS: output =8'h0A
+T2 address_byte PASS: output =8'h2C
+Error: T2 data_out MISMATCH: expected_output =8'hAD actual_output =ac
+Time: 9775 ns  Iteration: 1  Process: /spi_master_tb/Initial97_16  Scope: spi_master_tb  File: C:/Users/syaki/spi_master/spi_master.srcs/sim_1/new/spi_master_tb.sv Line: 163
+T2 write_byte PASS: output =8'hAB
+T2 memory[8'h2C] PASS: output =8'hAB
+I1 PASS: gap = 30 ns
+E1 data_out PASS: output =8'hAB
+I1 PASS: gap = 30 ns
+Error: E3 register 0x00 data_out MISMATCH: data_out =8'hAD actual_output =ac
+Time: 19535 ns  Iteration: 1  Process: /spi_master_tb/Initial97_16  Scope: spi_master_tb  File: C:/Users/syaki/spi_master/spi_master.srcs/sim_1/new/spi_master_tb.sv Line: 207
+I1 PASS: gap = 30 ns
+E3 register 0x02 data_out PASS: output =8'hF2
+I1 PASS: gap = 30 ns
+I3 address_byte PASS: output =8'h00
+Error: I3 data_out MISMATCH: data_out =8'hAD actual_output =ac
+Time: 29295 ns  Iteration: 1  Process: /spi_master_tb/Initial97_16  Scope: spi_master_tb  File: C:/Users/syaki/spi_master/spi_master.srcs/sim_1/new/spi_master_tb.sv Line: 247
+I1 PASS: gap = 30 ns
+R1 CS PASS: output =1
+R1 sclk PASS: output =0
+R1 mosi PASS: output =1
+R1 busy PASS: output =0
+R1 data_out PASS: output =8'hFF
+E2 CS PASS: output =1
+E2 sclk PASS: output =0
+E2 mosi PASS: output =1
+E2 busy PASS: output =0
+E2 data_out PASS: output =8'hFF
+I1 PASS: gap = 30 ns
+I2 cs_fall_count PASS: cs_fall_count =1
+FAIL 672 checks, 4 errors
+$finish called at time : 38415 ns : File "C:/Users/syaki/spi_master/spi_master.srcs/sim_1/new/spi_master_tb.sv" Line 408
